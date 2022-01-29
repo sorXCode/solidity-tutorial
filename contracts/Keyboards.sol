@@ -32,8 +32,10 @@ contract Keyboards {
     }
 
     function tip(uint256 _index) external payable {
-        address payable _owner = payable(createdKeyboards[_index]).owner;
-        _owner.transfer(msg.value);
+        address payable _owner = payable(createdKeyboards[_index].owner);
+        if (_owner != address(0)) {
+            _owner.transfer(msg.value);
+        }
     }
 
     function getKeyboards() public view returns (Keyboard[] memory) {
