@@ -5,9 +5,6 @@ async function main() {
 
     console.log("Keyboards contracts deployed at: ", keyboardsContract.address);
 
-    const txn = await keyboardsContract.create("Keychron D!");
-    await txn.wait();
-
     console.log("We've got keyboards: ", await keyboardsContract.getKeyboards());
 }
 

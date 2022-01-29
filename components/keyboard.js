@@ -1,9 +1,10 @@
 export default function Keyboard({kind, isPBT, filter}) {
   const kindDir = {
     0: 'sixty-percent',
-    1: 'seventy-five-percent',
-    2: 'eighty-percent',
-    3: 'iso-105',
+    1: 'sixty-five-percent',
+    2: 'seventy-five-percent',
+    3: 'eighty-percent',
+    4: 'iso-105',
   }[kind]
 
   const fileName = isPBT ? 'PBT' : 'ABS'

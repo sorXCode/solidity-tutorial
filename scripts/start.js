@@ -12,15 +12,15 @@ async function main() {
     await getKeyboards();
 
 
-    const txn = await keyboardsContract.create("Keychron K7");
+    const txn = await keyboardsContract.create(1, true, "Keychron K7");
     await txn.wait();
-    const txn_a = await keyboardsContract.connect(participant_a).create("Keychron Q1");
+    const txn_a = await keyboardsContract.connect(participant_a).create(0, false, "sepia");
     await txn_a.wait();
-    const txn_b = await keyboardsContract.connect(participant_b).create("Keychron K6");
+    const txn_b = await keyboardsContract.connect(participant_b).create(4, true, "grayscale");
     await txn_b.wait();
-    const txn_c = await keyboardsContract.connect(participant_c).create("Keychron k5 mini");
+    const txn_c = await keyboardsContract.connect(participant_c).create(3, true, "invert");
     await txn_c.wait();
-    const txn_d = await keyboardsContract.connect(participant_d).create("Keychron K8");
+    const txn_d = await keyboardsContract.connect(participant_d).create(2, false, "hue-rotate-90");
     await txn_d.wait();
 
     await getKeyboards();
