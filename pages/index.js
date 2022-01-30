@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import PrimaryButton from "../components/primary-button";
 import abi from "../utils/Keyboards.json";
+import TipButton from '../components/tip-button.js'
+import addressesEqual from "../utils/addressesEqual";
 import { ethers } from "ethers";
 import Keyboard from "../components/keyboard"
+import { UserCircleIcon } from "@heroicons/react/solid"
+
 
 export default function Home() {
   const [ethereum, setEthereum] = useState(undefined);
@@ -11,7 +15,7 @@ export default function Home() {
   const [newKeyboard, setNewKeyboard] = useState("");
   const [keyboardsLoading, setKeyboardsLoading] = useState(false);
 
-  const contractAddress = "0x188a53CE8CB161bbD653bf67d195307A5317a6e7"
+  const contractAddress = '0x0cB68cc947bA0E47FB307d10D5Cb7c1BbaB19610';
   const contractABI = abi.abi
 
   const handleAccounts = (accounts) => {
@@ -91,7 +95,6 @@ export default function Home() {
   useEffect(() => getKeyboards(), [connectedAccount])
 
 
-
   if (!ethereum) {
     return <p>Please install MetaMask to connect to this site</p>
   }
@@ -105,13 +108,19 @@ export default function Home() {
         <div><p>Connected to: {connectedAccount}</p></div>
         <PrimaryButton type="link" href="/create">Create a Keyboard!</PrimaryButton>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-2">
-          {console.log("KEYBOARDS=>", keyboards)}
-        
           {keyboards.map(
-            ([kind, isPBT, filter], i) => (
-              <Keyboard key={i} kind={kind} isPBT={isPBT} filter={filter} />
-            )
-          )}
+            ([kind, isPBT, filter, owner], i) => (
+              <div key={i} className="relative">
+                <Keyboard kind={kind} isPBT={isPBT} filter={filter} />
+                <span className="absolute top-1 right-6">
+                {addressesEqual(owner, connectedAccount) ?
+                  <UserCircleIcon className="h-5 w-5 text-indigo-100" /> :
+                  <TipButton ethereum={ethereum} index={i} />
+                }
+      </span>
+    </div>
+  )
+)}
         </div>
       </div>
     )

@@ -33,7 +33,7 @@ contract Keyboards {
 
     function tip(uint256 _index) external payable {
         address payable _owner = payable(createdKeyboards[_index].owner);
-        if (_owner != address(0)) {
+        if (_owner != address(0) || _owner != msg.sender) {
             _owner.transfer(msg.value);
         }
     }

@@ -16,7 +16,7 @@ export default function Create() {
   const [mining, setMining] = useState(false)
 
 
-  const contractAddress = '0x188a53CE8CB161bbD653bf67d195307A5317a6e7';
+  const contractAddress = '0x0cB68cc947bA0E47FB307d10D5Cb7c1BbaB19610';
   const contractABI = abi.abi;
 
   const handleAccounts = (accounts) => {
@@ -145,7 +145,7 @@ export default function Create() {
         <PrimaryButton className="bg-indigo-500" type="submit" disabled={mining} onClick={submitCreate}>
           <svg className="outline-cyan-500 animate-spin h-5 w-5 mr-3 ..." viewBox="0 0 24 24">
           </svg>  
-            Creating....
+            {mining? 'Creating....' : 'Create Keyboard'}
         </PrimaryButton>
       </form>
       <div>
