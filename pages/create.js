@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import PrimaryButton from "../components/primary-button";
 import Keyboard from "../components/keyboard";
 import abi from "../utils/Keyboards.json"
+import getKeyboardsContract from "../utils/getKeyboardsContract";
 
 export default function Create() {
 
@@ -15,9 +16,6 @@ export default function Create() {
   const [filter, setFilter] = useState('')
   const [mining, setMining] = useState(false)
 
-
-  const contractAddress = '0x0cB68cc947bA0E47FB307d10D5Cb7c1BbaB19610';
-  const contractABI = abi.abi;
 
   const handleAccounts = (accounts) => {
     if (accounts.length > 0) {
@@ -60,9 +58,7 @@ export default function Create() {
     }
     setMining(true);
     try {  
-      const provider = new ethers.providers.Web3Provider(ethereum);
-      const signer = provider.getSigner();
-      const keyboardsContract = new ethers.Contract(contractAddress, contractABI, signer);
+      const keyboardsContract = getKeyboardsContract(ethereum);
 
       const createTxn = await keyboardsContract.create(keyboardKind, isPBT, filter)
       console.log('Create transaction started...', createTxn.hash)

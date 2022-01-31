@@ -35,11 +35,11 @@ async function main() {
     // participant_a being tipped by owner
     const tipAmount = hre.ethers.utils.parseEther("1000");
     const tipTxn = await keyboardsContract.tip(1, {'value': tipAmount});
-    await tipTxn.wait();
+    const tipTxnReceipt = await tipTxn.wait();
+    console.log(tipTxnReceipt.events)
     console.log("Tipped: ", hre.ethers.utils.formatEther(tipAmount));
     const balanceAfter = await getBalance(participant_a.address)
     console.log("Balance After Tipping: ", hre.ethers.utils.formatEther(balanceAfter));
-    
 }
 
 main()

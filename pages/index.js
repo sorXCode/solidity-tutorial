@@ -6,7 +6,8 @@ import addressesEqual from "../utils/addressesEqual";
 import { ethers } from "ethers";
 import Keyboard from "../components/keyboard"
 import { UserCircleIcon } from "@heroicons/react/solid"
-
+import getKeyboardsContract from "../utils/getKeyboardsContract"
+import { toast } from "react-hot-toast"
 
 export default function Home() {
   const [ethereum, setEthereum] = useState(undefined);
@@ -15,7 +16,7 @@ export default function Home() {
   const [newKeyboard, setNewKeyboard] = useState("");
   const [keyboardsLoading, setKeyboardsLoading] = useState(false);
 
-  const contractAddress = '0x0cB68cc947bA0E47FB307d10D5Cb7c1BbaB19610';
+  const keyboardsContract = getKeyboardsContract(ethereum);
   const contractABI = abi.abi
 
   const handleAccounts = (accounts) => {
@@ -50,21 +51,14 @@ export default function Home() {
     handleAccounts(accounts);
   }
 
-  const getKeyboardContract = () => {
-
-  }
   const getKeyboards = async () => {
     if (ethereum && connectedAccount) {
       setKeyboardsLoading(true);
       try {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-
-        const keyboardsContract = new ethers.Contract(contractAddress, contractABI, signer);
         const keyboards = await keyboardsContract.getKeyboards();
+        console.log('Retrieved keyboards: ', keyboards);
 
         setKeyboards(keyboards);
-        console.log('Retrieved keyboards: ', keyboards);
       } finally {
         setKeyboardsLoading(false);
       }
@@ -77,11 +71,6 @@ export default function Home() {
       console.error("Ethereum object is required to create a keyboard");
       return;
     }
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    const signer = provider.getSigner();
-
-    const keyboardsContract = new ethers.Contract(contractAddress, contractABI, signer);
-
     const createTxn = await keyboardsContract.create(newKeyboard);
     console.log('Creating transaction for new keyboard ', createTxn.hash);
 
@@ -92,7 +81,25 @@ export default function Home() {
 
   }
 
-  useEffect(() => getKeyboards(), [connectedAccount])
+  const addContractEventHandlers = () => {
+    if (keyboardsContract && connectedAccount) {
+      keyboardsContract.on('KeyboardCreated', async (keyboard) => {
+        if (connectedAccount && !addressesEqual(keyboard.owner, connectedAccount)) {
+          toast('Somebody created a new keyboard!', { id: JSON.stringify(keyboard) })
+        }
+        await getKeyboards();
+      })
+      
+      keyboardsContract.on('TipSent', (recipient, amount) => {
+        if (addressesEqual(recipient, connectedAccount)) {
+          toast(`You received a tip of ${ethers.utils.formatEther(amount)} eth!`, { id: recipient + amount });
+        }
+      })
+    }
+  }
+  
+  useEffect(addContractEventHandlers, [!!keyboardsContract, connectedAccount]);
+  useEffect(() => getKeyboards(), [!!keyboardsContract, connectedAccount])
 
 
   if (!ethereum) {
