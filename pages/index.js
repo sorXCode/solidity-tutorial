@@ -8,48 +8,15 @@ import Keyboard from "../components/keyboard"
 import { UserCircleIcon } from "@heroicons/react/solid"
 import getKeyboardsContract from "../utils/getKeyboardsContract"
 import { toast } from "react-hot-toast"
+import { useMetaMaskAccount } from "../components/meta-mask-account-provider";
 
 export default function Home() {
-  const [ethereum, setEthereum] = useState(undefined);
-  const [connectedAccount, setConnectedAccount] = useState(undefined);
+  const { ethereum, connectedAccount, connectAccount } = useMetaMaskAccount();
+
   const [keyboards, setKeyboards] = useState([]);
-  const [newKeyboard, setNewKeyboard] = useState("");
   const [keyboardsLoading, setKeyboardsLoading] = useState(false);
 
   const keyboardsContract = getKeyboardsContract(ethereum);
-  const contractABI = abi.abi
-
-  const handleAccounts = (accounts) => {
-    if (accounts.length > 0) {
-      const account = accounts[0];
-      console.log("We have an authorized account: ", account);
-      setConnectedAccount(account);
-    } else {
-      console.log("No Account was authorized");
-    }
-  }
-
-  const getConnectedAccount = async () => {
-    if (window.ethereum) {
-      setEthereum(window.ethereum);
-    }
-    if (ethereum) {
-      const accounts = await ethereum.request({ method: "eth_accounts" });
-      handleAccounts(accounts)
-    }
-  }
-
-  useEffect(() => getConnectedAccount());
-
-  const connectAccount = async () => {
-    if (!ethereum) {
-      alert('MetaMask is required to connect an account');
-      return;
-    }
-
-    const accounts = await ethereum.request({ method: "eth_requestAccounts" })
-    handleAccounts(accounts);
-  }
 
   const getKeyboards = async () => {
     if (ethereum && connectedAccount) {
@@ -63,22 +30,6 @@ export default function Home() {
         setKeyboardsLoading(false);
       }
     }
-  }
-
-  const submitCreate = async (e) => {
-    e.preventDefault();
-    if (!ethereum) {
-      console.error("Ethereum object is required to create a keyboard");
-      return;
-    }
-    const createTxn = await keyboardsContract.create(newKeyboard);
-    console.log('Creating transaction for new keyboard ', createTxn.hash);
-
-    await createTxn.wait();
-    console.log('Created Keyboard ', createTxn.hash);
-
-    getKeyboards();
-
   }
 
   const addContractEventHandlers = () => {
@@ -122,12 +73,12 @@ export default function Home() {
                 <span className="absolute top-1 right-6">
                 {addressesEqual(owner, connectedAccount) ?
                   <UserCircleIcon className="h-5 w-5 text-indigo-100" /> :
-                  <TipButton ethereum={ethereum} index={i} />
+                  <TipButton keyboardsContract={keyboardsContract} index={i} />
                 }
-      </span>
-    </div>
-  )
-)}
+                </span>
+              </div>
+            )
+          )}
         </div>
       </div>
     )

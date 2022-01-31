@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import abi from "../utils/Keyboards.json"
 import getKeyboardsContract from "../utils/getKeyboardsContract";
 
-export default function TipButton({ ethereum, index }) {
+export default function TipButton({ keyboardsContract, index }) {
   const [mining, setMining] = useState(false)
 
   const submitTip = async (e) => {
@@ -15,8 +15,6 @@ export default function TipButton({ ethereum, index }) {
 
     setMining(true);
     try {
-      const keyboardsContract = getKeyboardsContract(ethereum);
-
       const tipTxn = await keyboardsContract.tip(index, { value: ethers.utils.parseEther("0.01") })
       console.log('Tip transaction started...', tipTxn.hash)
 
